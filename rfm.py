@@ -81,6 +81,7 @@ def kmeansrfm():
         for i in range(k):
             axc = k-3
             ax[axc//2,axc%2] 
+        continue
 
 
 def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
