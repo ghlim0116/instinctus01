@@ -11,7 +11,6 @@ from sklearn.preprocessing import MinMaxScaler as scaler
 import seaborn as sns
 import pickle
 from dateutil.parser import parse
-import scipy.stats as stats
 import sys
 sys.path.append("../log")
 import log
@@ -65,121 +64,128 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
     print(elapsed_time, "elapsed")
 
 def kmeansrfm():
-    ks = [3,4,5,6]
     df = pd.read_csv('rfm.csv',names=['id','R','F','M'])
-    df_ = df[['R','F','M']]
-    df_scale = scaler.transform(df_)
     
-    fig = plt.figure(figsize=(9,9),projection='3d')
-    ax = np.zeros(shape=(2,2))
-    for i in range(4):
-        ax[.0]
+    # elbow point
+    # df_r = df[['R']]
+    # df_f = df[['F']]
+    # df_m = df[['M']]
+    # point = {}
+    # for k in range(1,10):
+    #     kmeans = KMeans(n_clusters=k,max_iter=100).fit(df_m)
+    #     df_r['cluster'] = kmeans.labels_
+    #     point[k] = kmeans.inertia_
+    # plt.plot(list(point.keys()),list(point.values()))
+    # plt.show()
+    
+    ks = [3,5]
+    df_r = df[['R']]
+    df_f = df[['F']]
+    df_m = df[['M']]
+
+    fig = plt.figure(figsize=(8,10))
+    colors = [[0.13,0.09,0.23],[0.22,0.17,0.61],[0.47,0.48,0.92],[0.65,0.66,0.98],[0.84,0.85,1]]
+    Rmin, Rmax = 0, 366
+    Fmin, Fmax = 1, 12
+    Mmin, Mmax = 5000, 400000
     for k in ks:
         kmeans = KMeans(n_clusters=k,max_iter=100,n_init='auto',random_state=10)
-        kmeans.fit(df_scale)
-        df_['cluster'] = kmeans.fit_predict(df_scale)
-        for i in range(k):
-            axc = k-3
-            ax[axc//2,axc%2] 
-        continue
+        df_r = df_r.sort_values(by='R',ascending=True).reset_index(drop=True)
+        kmeans.fit(df_r)
+        df_r['cluster1'] = kmeans.labels_
+        df_r_describe = df_r.groupby('cluster1').describe()
+        df_r_describe = df_r_describe.sort_values(by=('R','max'),ascending=True)
+        index_before = df_r_describe.index
+        df_r_describe = df_r_describe.reset_index(drop=True)
+        index_after = df_r_describe.index
+        for i in range(len(df_r)):
+            for j in range(len(index_before)):
+                if df_r.loc[i,'cluster1'] == index_before[j]:
+                    df_r.loc[i,'cluster'] = index_after[j]
+        if k == 3:
+            ax1 = fig.add_subplot(3,2,1)
+            ax1.set_title('R %d' %k)
+            ax1.set_xlim(Rmin,Rmax)
+            for i in range(k):
+                ax1.hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[i],bins=np.arange(1,Rmax,5))
+        else:
+            ax2 = fig.add_subplot(3,2,2)
+            ax2.set_title('R %d' %k)
+            ax2.set_xlim(Rmin,Rmax)
+            for i in range(k):
+                ax2.hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[i],bins=np.arange(1,Rmax,5))
+    for k in ks:
+        kmeans = KMeans(n_clusters=k,max_iter=100,n_init='auto',random_state=10)
+        kmeans.fit(df_f)
+        df_f['cluster1'] = kmeans.labels_
+        df_f_describe = df_f.groupby('cluster1').describe()
+        df_f_describe = df_f_describe.sort_values(by=('F','max'),ascending=False)
+        index_before = df_f_describe.index
+        df_f_describe = df_f_describe.reset_index(drop=True)
+        print(df_f_describe)
+        index_after = df_f_describe.index
+        for i in range(len(df_f)):
+            for j in range(len(index_before)):
+                if df_f.loc[i,'cluster1'] == index_before[j]:
+                    df_f.loc[i,'cluster'] = index_after[j]
+        if k == 3:
+            ax3 = fig.add_subplot(3,2,3)
+            ax3.set_title('F %d' %k)
+            ax3.set_xlim(Fmin,Fmax)
+            ax3.set_yscale('log')
+            ax3.set_xticks(np.arange(1,Fmax+1,1))
+            #ax3.set_xscale('log')
+            for i in range(k):
+                #ax3.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=10**np.linspace(1,np.log10(xmax),200))
+                ax3.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=np.linspace(1,Fmax,Fmax))
+        else:
+            ax4 = fig.add_subplot(3,2,4)
+            ax4.set_title('F %d' %k)
+            ax4.set_xlim(Fmin,Fmax)
+            ax4.set_yscale('log')
+            ax4.set_xticks(np.arange(1,Fmax+1,1))
+            #ax4.set_xscale('log')
+            for i in range(k):
+                #ax4.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=10**np.linspace(1,np.log10(xmax),200))
+                ax4.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=np.linspace(1,Fmax,Fmax))
+    for k in ks:
+        kmeans = KMeans(n_clusters=k,max_iter=100,n_init='auto',random_state=10)
+        kmeans.fit(df_m)
+        df_m['cluster1'] = kmeans.labels_
+        df_m_describe = df_m.groupby('cluster1').describe()
+        df_m_describe = df_m_describe.sort_values(by=('M','max'),ascending=False)
+        index_before = df_m_describe.index
+        df_m_describe = df_m_describe.reset_index(drop=True)
+        index_after = df_m_describe.index
+        print(df_m_describe)
+        for i in range(len(df_m)):
+            for j in range(len(index_before)):
+                if df_m.loc[i,'cluster1'] == index_before[j]:
+                    df_m.loc[i,'cluster'] = index_after[j]
+        if k == 3:
+            ax5 = fig.add_subplot(3,2,5)
+            ax5.set_title('M %d' %k)
+            ax5.set_xlim(Mmin,Mmax)
+            #ax5.set_xticks(np.arange(1,Mmax+1,200))
+            # ax5.set_xscale('log')
+            ax5.set_yscale('log')
+            for i in range(k):
+                # ax5.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
+                ax5.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=np.linspace(1,Mmax,200))
+        else:
+            ax6 = fig.add_subplot(3,2,6)
+            ax6.set_title('M %d' %k)
+            ax6.set_xlim(Mmin,Mmax)
+            #ax6.set_xticks(np.arange(1,Mmax+1,2000))
+            # ax6.set_xscale('log')
+            ax6.set_yscale('log')
+            for i in range(k):
+                # ax6.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
+                ax6.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=np.linspace(1,Mmax,200))
+    plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,right=0.95,hspace=0.25)
+    plt.savefig('clustering_rfm.png')
+    plt.show()
 
-
-def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
-    with open('rfm.csv','r') as rfmcsv:
-        R, F, M = [], [], []
-        data = list(csv.reader(rfmcsv))
-    for x in data:
-        R += [float(x[1])]
-        F += [float(x[2])]
-        M += [float(x[3])]
-    del data
-    
-    Rmin, Rmax = 0, 366
-    Fmin, Fmax = 1, 11
-    Mmin, Mmax = 5000, 400000
-    Mticks = [10000,30000,100000,300000]
-    cmap = 'gist_ncar'
-    
-    fig= plt.figure(figsize=(16,9))
-    ax0 = fig.add_subplot(1,2,2, projection='3d')
-    ax0.set_title('3D distribution')
-    ax0.set_xlabel('Recency')
-    #ax0.set_xlim(Rmin, Rmax)
-    ax0.set_ylabel('Frequency')
-    ax0.set_ylim(Fmin, Fmax)
-    ax0.set_zlabel('Monetary')
-    ax0.set_zlim(Mmin, Mmax)
-    #ax0.set_zticks(Mticks)
-    #ax0.set_zscale('symlog')
-    #ax0.get_zaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    #ax0.zaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
-    ax0.scatter(R,F,M, marker=".", c='#211C35', alpha=0.5, s=2)
-    
-    ax1 = fig.add_subplot(3,4,1)
-    ax1.set_title('F-M Projection')
-    ax1.set_xlabel('Frequency')
-    ax1.set_ylabel('Monetary')
-    #ax1.set_yscale('symlog')
-    #ax1.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    #ax1_yspace = np.logspace(np.log10(Mmin),np.log10(Mmax),150)
-    #ax1.set_yticks(Mticks)
-    ax1.set_facecolor('k')
-    hist1 = ax1.hist2d(F,M,bins=(int(max(F)),180),cmap=cmap,norm=matplotlib.colors.LogNorm())
-    ax1.set_xlim(Fmin,Fmax)
-    ax1.set_ylim(Mmin, Mmax)
-    fig.colorbar(hist1[3],ax=ax1)
-        
-    ax2 = fig.add_subplot(3,4,5)
-    ax2.set_title('R-M Projection')
-    ax2.set_xlabel('Recency')
-    #ax2.set_xlim(Rmin, Rmax)
-    ax2.set_xticks(np.arange(0,Rmax,50))
-    ax2.set_ylabel('Monetary')
-    ax2.set_yscale('symlog')
-    ax2.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax2.set_yticks(Mticks)
-    ax2_yspace = np.logspace(np.log10(Mmin),np.log10(Mmax),100)
-    ax2.set_facecolor('k')
-    hist2 = ax2.hist2d(R,M,bins=(int(Rmax/3),ax2_yspace),cmap=cmap,norm=matplotlib.colors.LogNorm())
-    ax2.set_ylim(Mmin, Mmax)
-    fig.colorbar(hist2[3],ax=ax2)
-    
-    ax3 = fig.add_subplot(3,4,9)
-    ax3.set_title('R-F Projection')
-    ax3.set_xlabel('Recency')
-    #ax3.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    ax3.set_ylabel('Frequency')
-    ax3.set_yticks(np.arange(0,Fmax,5))
-    ax3.set_facecolor('k')
-    hist3 = ax3.hist2d(R,F,bins=(Rmax,int(max(F))),cmap=cmap,norm=matplotlib.colors.LogNorm())
-    ax3.set_xlim(Rmin,Rmax)
-    ax3.set_ylim(Fmin,Fmax)
-    fig.colorbar(hist3[3],ax=ax3)
-
-    ax4 = fig.add_subplot(3,4,2)
-    ax4.set_title('R histogram')
-    ax4.set_xlabel('Recency')
-    ax4.hist(R,bins=(range(Rmin,Rmax,10)),color='#211C35')
-
-    ax5 = fig.add_subplot(3,4,6)
-    ax5.set_title('F histogram')
-    ax5.set_xlabel('Frequency')
-    ax5.set_yscale('symlog')
-    ax5.hist(F,bins=(range(Fmin,Fmax,1)),color='#211C35')
-
-    ax6 = fig.add_subplot(3,4,10)
-    ax6.set_title('M histogram')
-    ax6.set_xlabel('Monetary')
-    ax6.set_xticks(np.arange(0,800000,200000))
-    ax6.set_yscale('symlog')
-    ax6.hist(M,bins=(range(Mmin,Mmax,5000)),color='#211C35')
-    
-    plt.subplots_adjust(left=0.05,bottom=0.05,top=0.92,right=0.95,hspace=0.35)
-    plt.suptitle('RFM scatter', fontsize=16)
-    pickle.dump(fig, open(time1+' rfm.fig.pickle','wb'))
-    plt.savefig(time1+'  rfm.image.png')
-    if showplt == True:
-        plt.show()
     
 def classrfm(Nclass=10,time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=False):
     # 데이터 불러오기
@@ -322,6 +328,103 @@ def classrfm(Nclass=10,time1 = datetime.datetime.now().strftime("%y-%m-01"),show
     if showplt == True:
         plt.show()
 
+def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
+    df = pd.read_csv('rfmall.csv',names=['date','id','R','F','M','rc','fc','mc','rfmindex'])
+    Nclass = df['rc'].nunique()
+
+    Rmin, Rmax = 0, 366
+    Fmin, Fmax = 1, 12
+    Mmin, Mmax = 5000, 400000
+    Mticks = [10000,30000,100000,300000]
+    cmap = 'gist_ncar'
+    colors = [[0.13,0.09,0.23],[0.22,0.17,0.61],[0.47,0.48,0.92],[0.65,0.66,0.98],[0.84,0.85,1]][::-1]
+    
+    fig= plt.figure(figsize=(16,9))
+    ax0 = fig.add_subplot(1,2,2, projection='3d')
+    ax0.set_title('3D distribution')
+    ax0.set_xlabel('Recency')
+    #ax0.set_xlim(Rmin, Rmax)
+    ax0.set_ylabel('Frequency')
+    ax0.set_ylim(Fmin, Fmax)
+    ax0.set_zlabel('Monetary')
+    ax0.set_zlim(Mmin, Mmax)
+    #ax0.set_zticks(Mticks)
+    #ax0.set_zscale('symlog')
+    #ax0.get_zaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    #ax0.zaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+    ax0.scatter(df['R'],df['F'],df['M'], marker=".", c='#211C35', alpha=0.5, s=2)
+
+    ax1 = fig.add_subplot(3,4,1)
+    ax1.set_title('F-M Projection')
+    ax1.set_xlabel('Frequency')
+    ax1.set_ylabel('Monetary')
+    #ax1.set_yscale('symlog')
+    #ax1.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    #ax1_yspace = np.logspace(np.log10(Mmin),np.log10(Mmax),150)
+    #ax1.set_yticks(Mticks)
+    ax1.set_facecolor('k')
+    hist1 = ax1.hist2d(df['F'],df['M'],bins=(int(max(df['F'])),180),cmap=cmap,norm=matplotlib.colors.LogNorm())
+    ax1.set_xlim(Fmin,Fmax)
+    ax1.set_ylim(Mmin, Mmax)
+    fig.colorbar(hist1[3],ax=ax1)
+    
+    ax2 = fig.add_subplot(3,4,5)
+    ax2.set_title('R-M Projection')
+    ax2.set_xlabel('Recency')
+    #ax2.set_xlim(Rmin, Rmax)
+    ax2.set_xticks(np.arange(0,Rmax,50))
+    ax2.set_ylabel('Monetary')
+    ax2.set_yscale('symlog')
+    ax2.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax2.set_yticks(Mticks)
+    ax2_yspace = np.logspace(np.log10(Mmin),np.log10(Mmax),100)
+    ax2.set_facecolor('k')
+    hist2 = ax2.hist2d(df['R'],df['M'],bins=(int(Rmax/3),ax2_yspace),cmap=cmap,norm=matplotlib.colors.LogNorm())
+    ax2.set_ylim(Mmin, Mmax)
+    fig.colorbar(hist2[3],ax=ax2)
+    
+    ax3 = fig.add_subplot(3,4,9)
+    ax3.set_title('R-F Projection')
+    ax3.set_xlabel('Recency')
+    #ax3.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax3.set_ylabel('Frequency')
+    ax3.set_yticks(np.arange(0,Fmax,5))
+    ax3.set_facecolor('k')
+    hist3 = ax3.hist2d(df['R'],df['F'],bins=(Rmax,int(max(df['F']))),cmap=cmap,norm=matplotlib.colors.LogNorm())
+    ax3.set_xlim(Rmin,Rmax)
+    ax3.set_ylim(Fmin,Fmax)
+    fig.colorbar(hist3[3],ax=ax3)
+
+    ax4 = fig.add_subplot(3,4,2)
+    ax4.set_title('R histogram')
+    ax4.set_xlabel('Recency')
+    for i in range(Nclass):
+        ax4.hist(df.loc[df['rc']==i+1,'R'],bins=(range(Rmin,Rmax,5)),color=colors[i])
+
+    ax5 = fig.add_subplot(3,4,6)
+    ax5.set_title('F histogram')
+    ax5.set_xlabel('Frequency')
+    ax5.set_yscale('symlog')
+    for i in range(Nclass):
+        ax5.hist(df.loc[df['fc']==i+1,'F'],bins=(range(Fmin,Fmax,1)),color=colors[i])
+
+    ax6 = fig.add_subplot(3,4,10)
+    ax6.set_title('M histogram')
+    ax6.set_xlabel('Monetary')
+    # ax6.set_xticks(np.arange(0,800000,200000))
+    ax6.set_yscale('symlog')
+    # ax6.set_xscale('log')
+    for i in range(Nclass):
+        # ax6.hist(df.loc[df['mc']==i+1,'M'],bins=(10**np.linspace(np.log10(3000),np.log10(Mmax),200)),color=colors[i])
+        ax6.hist(df.loc[df['mc']==i+1,'M'],bins=(np.linspace(Mmin,Mmax,200)),color=colors[i])
+    
+    plt.subplots_adjust(left=0.05,bottom=0.05,top=0.92,right=0.95,hspace=0.35)
+    plt.suptitle('RFM scatter', fontsize=16)
+    pickle.dump(fig, open(time1+' rfm.fig.pickle','wb'))
+    plt.savefig(time1+'  rfm.image.png')
+    if showplt == True:
+        plt.show()
+
 def uploadrfm():
     conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
     cur = conn.cursor()
@@ -346,6 +449,6 @@ if __name__ == '__main__':
     #for time1 in time:
         #getrfm(time1=time1)
         kmeansrfm()
-        #plotrfm(time1=time1,showplt=False)
-        #classrfm(5,time1=time1,showplt=False)
+        # classrfm(5,time1=time1,showplt=False)
+        # plotrfm(time1=time1,showplt=True)
         #uploadrfm()
