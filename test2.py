@@ -12,4 +12,7 @@ sys.path.append("../log")
 import mail
 import log
 
-a = np.array([0,1,2,3])
+a = np.array([-1 for a in range(10)])
+df = pd.DataFrame(a,columns=['x'])
+print(len(df))
+
