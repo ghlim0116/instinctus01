@@ -79,27 +79,30 @@ def kmeansrfm():
     # plt.show()
     
     ks = [3,5]
-    df_r = df[['R']]
-    df_f = df[['F']]
-    df_m = df[['M']]
-
+    
     fig = plt.figure(figsize=(8,10))
-    colors = [[0.13,0.09,0.23],[0.22,0.17,0.61],[0.47,0.48,0.92],[0.65,0.66,0.98],[0.84,0.85,1]]
+    colors = [[0.13,0.09,0.23],[0.22,0.17,0.61],[0.47,0.48,0.92],[0.65,0.66,0.98],[0.84,0.85,1]][::-1]
     Rmin, Rmax = 0, 366
     Fmin, Fmax = 1, 12
     Mmin, Mmax = 5000, 400000
+    df_cluster = pd.DataFrame([-1 for x in range(len(df))])
     for k in ks:
+        df_r = df[['R']]
         kmeans = KMeans(n_clusters=k,max_iter=100,n_init='auto',random_state=10)
-        df_r = df_r.sort_values(by='R',ascending=True).reset_index(drop=True)
+        #df_r = df_r.sort_values(by='R',ascending=True).reset_index(drop=True)
         kmeans.fit(df_r)
+        df_r['cluster'] = df_cluster
         df_r['cluster1'] = kmeans.labels_
         df_r_describe = df_r.groupby('cluster1').describe()
-        df_r_describe = df_r_describe.sort_values(by=('R','max'),ascending=True)
+        df_r_describe = df_r_describe.sort_values(by=('R','max'),ascending=False)
         index_before = df_r_describe.index
         df_r_describe = df_r_describe.reset_index(drop=True)
         index_after = df_r_describe.index
+        
         for i in range(len(df_r)):
             for j in range(len(index_before)):
+                if df_r.loc[i,'cluster'] >= 0:
+                    continue
                 if df_r.loc[i,'cluster1'] == index_before[j]:
                     df_r.loc[i,'cluster'] = index_after[j]
         if k == 3:
@@ -107,25 +110,28 @@ def kmeansrfm():
             ax1.set_title('R %d' %k)
             ax1.set_xlim(Rmin,Rmax)
             for i in range(k):
-                ax1.hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[i],bins=np.arange(1,Rmax,5))
+                ax1.hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[2*i],bins=np.arange(1,Rmax,5))
         else:
             ax2 = fig.add_subplot(3,2,2)
             ax2.set_title('R %d' %k)
             ax2.set_xlim(Rmin,Rmax)
             for i in range(k):
                 ax2.hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[i],bins=np.arange(1,Rmax,5))
-    for k in ks:
+    for k in ks:    
+        df_f = df[['F']]
         kmeans = KMeans(n_clusters=k,max_iter=100,n_init='auto',random_state=10)
         kmeans.fit(df_f)
+        df_f['cluster'] = df_cluster
         df_f['cluster1'] = kmeans.labels_
         df_f_describe = df_f.groupby('cluster1').describe()
-        df_f_describe = df_f_describe.sort_values(by=('F','max'),ascending=False)
+        df_f_describe = df_f_describe.sort_values(by=('F','max'),ascending=True)
         index_before = df_f_describe.index
         df_f_describe = df_f_describe.reset_index(drop=True)
-        print(df_f_describe)
         index_after = df_f_describe.index
         for i in range(len(df_f)):
             for j in range(len(index_before)):
+                if df_f.loc[i,'cluster'] >= 0:
+                    continue
                 if df_f.loc[i,'cluster1'] == index_before[j]:
                     df_f.loc[i,'cluster'] = index_after[j]
         if k == 3:
@@ -136,8 +142,8 @@ def kmeansrfm():
             ax3.set_xticks(np.arange(1,Fmax+1,1))
             #ax3.set_xscale('log')
             for i in range(k):
-                #ax3.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=10**np.linspace(1,np.log10(xmax),200))
-                ax3.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=np.linspace(1,Fmax,Fmax))
+                #ax3.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[2*i],bins=10**np.linspace(1,np.log10(xmax),200))
+                ax3.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[2*i],bins=np.linspace(1,Fmax,Fmax))
         else:
             ax4 = fig.add_subplot(3,2,4)
             ax4.set_title('F %d' %k)
@@ -149,17 +155,20 @@ def kmeansrfm():
                 #ax4.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=10**np.linspace(1,np.log10(xmax),200))
                 ax4.hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=np.linspace(1,Fmax,Fmax))
     for k in ks:
+        df_m = df[['M']]
         kmeans = KMeans(n_clusters=k,max_iter=100,n_init='auto',random_state=10)
         kmeans.fit(df_m)
+        df_m['cluster'] = df_cluster
         df_m['cluster1'] = kmeans.labels_
         df_m_describe = df_m.groupby('cluster1').describe()
-        df_m_describe = df_m_describe.sort_values(by=('M','max'),ascending=False)
+        df_m_describe = df_m_describe.sort_values(by=('M','max'),ascending=True)
         index_before = df_m_describe.index
         df_m_describe = df_m_describe.reset_index(drop=True)
         index_after = df_m_describe.index
-        print(df_m_describe)
         for i in range(len(df_m)):
             for j in range(len(index_before)):
+                if df_m.loc[i,'cluster'] >= 0:
+                    continue
                 if df_m.loc[i,'cluster1'] == index_before[j]:
                     df_m.loc[i,'cluster'] = index_after[j]
         if k == 3:
@@ -170,8 +179,8 @@ def kmeansrfm():
             # ax5.set_xscale('log')
             ax5.set_yscale('log')
             for i in range(k):
-                # ax5.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
-                ax5.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=np.linspace(1,Mmax,200))
+                # ax5.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[2*i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
+                ax5.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[2*i],bins=np.linspace(1,Mmax,200))
         else:
             ax6 = fig.add_subplot(3,2,6)
             ax6.set_title('M %d' %k)
@@ -182,6 +191,12 @@ def kmeansrfm():
             for i in range(k):
                 # ax6.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
                 ax6.hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=np.linspace(1,Mmax,200))
+    
+    df['r_grade'] = df_r['cluster']+1
+    df['f_grade'] = df_f['cluster']+1
+    df['m_grade'] = df_m['cluster']+1
+    df.to_csv('rfmMLall.csv',index=False,)
+
     plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,right=0.95,hspace=0.25)
     plt.savefig('clustering_rfm.png')
     plt.show()
@@ -420,8 +435,8 @@ def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
     
     plt.subplots_adjust(left=0.05,bottom=0.05,top=0.92,right=0.95,hspace=0.35)
     plt.suptitle('RFM scatter', fontsize=16)
-    pickle.dump(fig, open(time1+' rfm.fig.pickle','wb'))
-    plt.savefig(time1+'  rfm.image.png')
+    pickle.dump(fig, open('./plotrfm/'+time1+' rfm.fig.pickle','wb'))
+    plt.savefig('./plotrfm/'+time1+' rfm.image.png')
     if showplt == True:
         plt.show()
 
@@ -448,7 +463,7 @@ if __name__ == '__main__':
     if True:
     #for time1 in time:
         #getrfm(time1=time1)
-        kmeansrfm()
+        #kmeansrfm()
         # classrfm(5,time1=time1,showplt=False)
-        # plotrfm(time1=time1,showplt=True)
+        plotrfm(time1=time1,showplt=True)
         #uploadrfm()
