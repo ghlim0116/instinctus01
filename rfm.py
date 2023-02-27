@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score as S_index
 from sklearn.metrics import calinski_harabasz_score as CH_index
+from sklearn.metrics import davies_bouldin_score as DB_index
 import seaborn as sns
 import pickle
 from dateutil.parser import parse
@@ -63,7 +65,7 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
     elapsed_time = timef - times
     print(elapsed_time, "elapsed")
 
-def kmeansrfm():
+def kmeansrfm(ks = [4],showplt=False,showindex=False):
     df = pd.read_csv('rfm.csv',names=['id','R','F','M'])
     
     # elbow point
@@ -78,17 +80,18 @@ def kmeansrfm():
     # plt.plot(list(point.keys()),list(point.values()))
     # plt.show()
     
-    ks = [3,4,5]
-    CH_indices = pd.DataFrame(np.zeros(shape=(3,len(ks))),columns=ks,index=['R','F','M'])
-    fig, ax = plt.subplots(3,3,figsize=(16,9))
-    colors = [[0.13,0.09,0.23],[0.22,0.17,0.61],[0.47,0.48,0.92],[0.65,0.66,0.98],[0.84,0.85,1]][::-1]
+    ks = ks
+    S_indices = pd.DataFrame(np.zeros(shape=(3,len(ks))),columns=ks,index=['RS','FS','MS'])
+    CH_indices = pd.DataFrame(np.zeros(shape=(3,len(ks))),columns=ks,index=['RC','FC','MC'])
+    DB_indices = pd.DataFrame(np.zeros(shape=(3,len(ks))),columns=ks,index=['RD','FD','MD'])
+    fig, ax = plt.subplots(3,len(ks),figsize=(16,9))
+    colors = [[0.13,0.09,0.23],[0.30,0.28,0.75],[0.55,0.56,0.98],[0.84,0.85,1]][::-1]
     Rmin, Rmax = 0, 366
     Fmin, Fmax = 1, 12
     Mmin, Mmax = 5000, 400000
     df_cluster = pd.DataFrame([-1 for x in range(len(df))])
     for k in range(len(ks)):
-        kmeans = KMeans(n_clusters=ks[k],max_iter=100,n_init='auto',random_state=10)
-        #df_r = df_r.sort_values(by='R',ascending=True).reset_index(drop=True)
+        kmeans = KMeans(n_clusters=ks[k],max_iter=100,n_init=20,random_state=10)
         df_r = df[['R']].copy()
         kmeans.fit(df_r)
         r_cluster = kmeans.predict(df_r)
@@ -105,11 +108,6 @@ def kmeansrfm():
                     continue
                 if df_r.loc[i,'cluster1'] == index_before[j]:
                     df_r.loc[i,'cluster'] = index_after[j]
-        CH_indices.iloc[0,k] = int(CH_index(df_r[['R']],r_cluster))
-        ax[0,k].set_title('R %d' %ks[k])
-        ax[0,k].set_xlim(Rmin,Rmax)
-        for i in range(ks[k]):
-            ax[0,k].hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[i],bins=np.arange(1,Rmax,5))
         
         df_f = df[['F']].copy()
         kmeans.fit(df_f)
@@ -127,15 +125,6 @@ def kmeansrfm():
                     continue
                 if df_f.loc[i,'cluster1'] == index_before[j]:
                     df_f.loc[i,'cluster'] = index_after[j]
-        CH_indices.iloc[1,k] = int(CH_index(df_f[['F']],f_cluster))
-        ax[1,k].set_title('F %d' %ks[k])
-        ax[1,k].set_xticks(np.arange(1,Fmax+1,1))
-        ax[1,k].set_xlim(Fmin,Fmax)
-        ax[1,k].set_yscale('log')
-        #ax[1,k].set_xscale('log')
-        for i in range(ks[k]):
-            #ax[1,k].hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[2*i],bins=10**np.linspace(1,np.log10(xmax),200))
-            ax[1,k].hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=np.linspace(1,Fmax,Fmax))            
         
         df_m = df[['M']].copy()
         kmeans.fit(df_m)
@@ -153,178 +142,142 @@ def kmeansrfm():
                     continue
                 if df_m.loc[i,'cluster1'] == index_before[j]:
                     df_m.loc[i,'cluster'] = index_after[j]
-        CH_indices.iloc[2,k] = int(CH_index(df_m[['M']],m_cluster))
-        ax[2,k].set_title('M %d' %ks[k])
-        ax[2,k].set_xlim(Mmin,Mmax)
-        #ax[2,k].set_xticks(np.arange(1,Mmax+1,200))
-        # ax[2,k].set_xscale('log')
-        ax[2,k].set_yscale('log')
-        for i in range(ks[k]):
-            # ax[2,k].hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
-            ax[2,k].hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=np.linspace(1,Mmax,200))
         
-    print(CH_indices)
+        print(df_r_describe['R'])
+        print(df_f_describe['F'])
+        print(df_m_describe['M'])
+        if showplt == True:
+            ax[0,k].set_title('R %d' %ks[k])
+            ax[0,k].set_xlim(Rmin,Rmax)
+            for i in range(ks[k]):
+                ax[0,k].hist(df_r.loc[df_r['cluster'] == i,['R']],color=colors[i],bins=np.arange(1,Rmax,5))
+            
+            ax[1,k].set_title('F %d' %ks[k])
+            ax[1,k].set_xticks(np.arange(1,Fmax+1,1))
+            ax[1,k].set_xlim(Fmin,Fmax)
+            ax[1,k].set_yscale('log')
+            #ax[1,k].set_xscale('log')
+            for i in range(ks[k]):
+                #ax[1,k].hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[2*i],bins=10**np.linspace(1,np.log10(xmax),200))
+                ax[1,k].hist(df_f.loc[df_f['cluster'] == i,['F']],color=colors[i],bins=np.linspace(1,Fmax,Fmax))            
+            
+            ax[2,k].set_title('M %d' %ks[k])
+            ax[2,k].set_xlim(Mmin,Mmax)
+            # ax[2,k].set_xticks(np.arange(1,Mmax+1,200))
+            # ax[2,k].set_xscale('log')
+            ax[2,k].set_yscale('log')
+            for i in range(ks[k]):
+                # ax[2,k].hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=10**np.linspace(np.log10(3000),np.log10(Mmax),200))
+                ax[2,k].hist(df_m.loc[df_m['cluster'] == i,['M']],color=colors[i],bins=np.linspace(1,Mmax,200))
+        
+        if showindex == True:
+            S_indices.iloc[0,k] = S_index(df_r[['R']],r_cluster)
+            CH_indices.iloc[0,k] = CH_index(df_r[['R']],r_cluster)
+            DB_indices.iloc[0,k] = DB_index(df_r[['R']],r_cluster)
+            S_indices.iloc[1,k] = S_index(df_f[['F']],f_cluster)
+            CH_indices.iloc[1,k] = CH_index(df_f[['F']],f_cluster)
+            DB_indices.iloc[1,k] = DB_index(df_f[['F']],f_cluster)
+            S_indices.iloc[2,k] = S_index(df_m[['M']],m_cluster)
+            CH_indices.iloc[2,k] = CH_index(df_m[['M']],m_cluster)
+            DB_indices.iloc[2,k] = DB_index(df_m[['M']],m_cluster)
+    
+    if showindex == True:
+        SCD_indices = pd.concat([S_indices,CH_indices,DB_indices])
+        SCD_indices.to_csv('rfmMLindex.csv',index=True)
+        print(SCD_indices)
     
     df['r_grade'] = df_r['cluster']+1
     df['f_grade'] = df_f['cluster']+1
     df['m_grade'] = df_m['cluster']+1
     df.to_csv('rfmMLall.csv',index=False,)
 
-    plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,right=0.95,hspace=0.25)
-    plt.savefig('clustering_rfm.png')
-    plt.show()
+    if showplt==True:
+        plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,right=0.95,hspace=0.25)
+        plt.savefig('clustering_rfm.png')
+        plt.show()
 
-def classrfm(Nclass=10,time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=False):
+def classrfmML(Nclass=4,time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=False):
     # 데이터 불러오기
-    with open('rfm.csv','r') as rfmcsv:
-        rfm_o = np.empty(shape=(0,3))
-        data = list(csv.reader(rfmcsv))
-        member = []
-        for x in data:
-            if float(x[3]) != 0:
-                member += [x[0]]
-                rfm_o = np.append(rfm_o,np.array([[float(x[1]),float(x[2]),float(x[3])]]),axis=0)
-    Nclass = Nclass
-    lenrfm = len(rfm_o)
-    sumpayment = sum(rfm_o.T[2])
-    rfm_o = np.append(rfm_o,np.zeros(shape=(lenrfm,3)),axis=1)
-    rfm = rfm_o.copy()
-
-    # RFM 등급 분류
-    percentage,percentile = np.zeros(shape=(Nclass)),np.zeros(shape=(Nclass))
-    for i in range(1,Nclass):
-        #percentage[i] = sum([x for x in range(Nclass-i+1,Nclass+1)])/sum([x for x in range(1,Nclass+1)]) # 1:2:3: ... :(N-1):N
-        percentage[i] = i/Nclass    # 일정 비율
-        if round(percentage[i] * lenrfm,4) == int(percentage[i] * lenrfm) and percentage[i] != 0:
-            percentile[i] = int(percentage[i] * lenrfm) - 1
-        else:
-            percentile[i] = int(percentage[i] * lenrfm)
-
-    # R/F/M 등급 기준
-    rfm_criteria = np.zeros(shape=(Nclass,3,3))
-    for l in range(3): # l=0:R, l=1:F, l=2:M
-        if l == 0:
-            rfm = np.array(sorted(rfm,key=lambda x: (x[0],x[1],x[2]))[::-1])       # R이 겹치면 F,M으로 한 번 더 정렬해줌
-        elif l == 1:
-            rfm = np.array(sorted(rfm,key=lambda x: (x[1],x[2],x[0])))             # F가 겹치면 M,R로 한 번 더 정렬해줌
-        elif l == 2:
-            rfm = np.array(sorted(rfm,key=lambda x: (x[2],x[1],x[0])))             # M이 겹치면 F,R로 한 번 더 정렬해줌
-        j = 0
-        for i in range(lenrfm):
-            if j < Nclass and i == int(percentile[j]):
-                for k in range(3):
-                    rfm_criteria[j,l,k] = rfm[i,k]
-                j += 1
-            rfm[i,l+3] = j
+    df = pd.read_csv('rfmMLall.csv',names=['id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
     
-    # RFM_o에 멤버 순서에 맞게 등급 저장
-    for i in range(lenrfm):
-        rfm_o[i,3],rfm_o[i,4],rfm_o[i,5] = 1, 1, 1
-        for j in range(Nclass-1,-1,-1):
-            if rfm_o[i,0] < rfm_criteria[j,0,0] or (rfm_o[i,0] == rfm_criteria[j,0,0] and rfm_o[i,1] > rfm_criteria[j,0,1]) or (rfm_o[i,0] == rfm_criteria[j,0,0] and rfm_o[i,1] == rfm_criteria[j,0,1] and rfm_o[i,2] >= rfm_criteria[j,0,2]):
-                rfm_o[i,3] = j+1
-                break
-        for j in range(Nclass-1,-1,-1):
-            if rfm_o[i,1] > rfm_criteria[j,1,1] or (rfm_o[i,1] == rfm_criteria[j,1,1] and rfm_o[i,2] > rfm_criteria[j,1,2]) or (rfm_o[i,1] == rfm_criteria[j,1,1] and rfm_o[i,2] == rfm_criteria[j,1,2] and rfm_o[i,0] <= rfm_criteria[j,1,0]):
-                rfm_o[i,4] = j+1
-                break
-        for j in range(Nclass-1,-1,-1):
-            if rfm_o[i,2] > rfm_criteria[j,2,2] or (rfm_o[i,2] == rfm_criteria[j,2,2] and rfm_o[i,1] > rfm_criteria[j,2,1]) or (rfm_o[i,2] == rfm_criteria[j,2,2] and rfm_o[i,1] == rfm_criteria[j,2,1] and rfm_o[i,0] <= rfm_criteria[j,2,0]):
-                rfm_o[i,5] = j+1
-                break
-    rfm = rfm_o.copy()
-    
+    # raise SystemError
+    sumpayment = df['M'].sum()
+    lenrfm = len(df)
     # 6개 순서대로 등급별 0고객수, 1매출액, 2구성비, 3매출기여도, 4기여효과, 5기준, 6등급, 7가중치
-    reff,feff,meff = np.zeros(shape=(Nclass,8)),np.zeros(shape=(Nclass,8)),np.zeros(shape=(Nclass,8))
+    eff = np.zeros(shape=(3,Nclass,8))
     for i in range(Nclass):
-        reff[i,0] = sum([1 for x in rfm.T[3] if x == Nclass-i])
-        reff[i,1] = sum([x[2] for x in rfm if x[3] == Nclass-i])
-        reff[i,2] = reff[i,0]/lenrfm
-        reff[i,3] = reff[i,1]/sumpayment
-        reff[i,4] = reff[i,3] / reff[i,2]
-        reff[i,5] = rfm_criteria[Nclass-i-1,0,0]
-        reff[i,6] = Nclass-i
-        feff[i,0] = sum([1 for x in rfm.T[4] if x == Nclass-i])
-        feff[i,1] = sum([x[2] for x in rfm if x[4] == Nclass-i])
-        feff[i,2] = feff[i,0]/lenrfm
-        feff[i,3] = feff[i,1]/sumpayment
-        feff[i,4] = feff[i,3] / feff[i,2]
-        feff[i,5] = rfm_criteria[Nclass-i-1,1,1]
-        feff[i,6] = Nclass-i
-        meff[i,0] = sum([1 for x in rfm.T[5] if x == Nclass-i])
-        meff[i,1] = sum([x[2] for x in rfm if x[5] == Nclass-i])
-        meff[i,2] = meff[i,0]/lenrfm
-        meff[i,3] = meff[i,1]/sumpayment
-        meff[i,4] = meff[i,3] / meff[i,2]
-        meff[i,5] = rfm_criteria[Nclass-i-1,2,2]
-        meff[i,6] = Nclass-i
+        for j in range(3): # eff[0]: R, eff[1]: F, eff[2]: M
+            if j == 0:
+                eff[0,i,0] = df.groupby(by='r_grade')['R'].describe().loc[i+1,'count']
+                eff[0,i,1] = df.loc[df['r_grade'] == i+1,'M'].sum()
+                eff[j,i,5] = df.groupby(by='r_grade')['R'].describe().loc[i+1,'min']
+            elif j == 1:
+                eff[1,i,0] = df.groupby(by='f_grade')['F'].describe().loc[i+1,'count']
+                eff[1,i,1] = df.loc[df['f_grade'] == i+1,'M'].sum()
+                eff[j,i,5] = df.groupby(by='f_grade')['F'].describe().loc[i+1,'min']
+            elif j == 2:
+                eff[2,i,0] = df.groupby(by='m_grade')['M'].describe().loc[i+1,'count']
+                eff[2,i,1] = df.loc[df['m_grade'] == i+1,'M'].sum()
+                eff[j,i,5] = df.groupby(by='m_grade')['M'].describe().loc[i+1,'min']
+            eff[j,i,2] = eff[j,i,0]/lenrfm
+            eff[j,i,3] = eff[j,i,1]/sumpayment
+            eff[j,i,4] = eff[j,i,3] / eff[j,i,2]            
+            eff[j,i,6] = i+1
     
-    reff = np.array([x for x in reff if x[0] != 0])
-    feff = np.array([x for x in feff if x[0] != 0])
-    meff = np.array([x for x in meff if x[0] != 0])    
-
-    # 등급과 매출기여도 회귀선의 기울기로 가중치 구하기
-    rpf = np.polyfit(reff.T[6],reff.T[3],1)
-    fpf = np.polyfit(feff.T[6],feff.T[3],1)
-    mpf = np.polyfit(meff.T[6],meff.T[3],1)
+    # 등급과 기여효과 회귀선의 기울기로 가중치 구하기
+    rpf = np.polyfit(eff[0].T[6],eff[0].T[4],1)
+    fpf = np.polyfit(eff[1].T[6],eff[1].T[4],1)
+    mpf = np.polyfit(eff[2].T[6],eff[2].T[4],1)
     rfm_weight = rpf[0] + fpf[0] + mpf[0]
     r_weight = rpf[0] / rfm_weight
     f_weight = fpf[0] / rfm_weight
     m_weight = mpf[0] / rfm_weight
-    reff[:,7] = r_weight
-    feff[:,7] = f_weight
-    meff[:,7] = m_weight
-    
-    # RFM 등급 저장
-    with open('rfmall.csv','w') as rfmallcsv:
-        csv_writer = csv.writer(rfmallcsv)
-        rfm_index = []
-        for i in range(lenrfm):
-            rfm_index += [rfm[i,3] * r_weight + rfm[i,4] * f_weight + rfm[i,5] * m_weight]
-            csv_writer.writerow([time1] + [member[i]] + [int(x) for x in rfm[i]] + [rfm_index[i]])
+    eff[0,:,7] = r_weight
+    eff[1,:,7] = f_weight
+    eff[2,:,7] = m_weight
+    print(eff)
     
     # RFM class 저장
-    with open('rfmclass.csv','w') as rfmclasscsv:
+    with open('rfmMLclass.csv','w') as rfmclasscsv:
         csv_writer = csv.writer(rfmclasscsv)
-        for i in range(Nclass):
-            csv_writer.writerow([time1] + ["R"] + [int(reff[i,6])] + [x for x in reff[i,:6]] + [reff[i,7]])
-            csv_writer.writerow([time1] + ["F"] + [int(feff[i,6])] + [x for x in feff[i,:6]] + [feff[i,7]])
-            csv_writer.writerow([time1] + ["M"] + [int(meff[i,6])] + [x for x in meff[i,:6]] + [meff[i,7]])
+        rfm = ['R','F','M']
+        for j in range(3):
+            for i in range(Nclass):
+                csv_writer.writerow([time1] + [rfm[j]] + [int(eff[j,i,6])] + [x for x in eff[j,i,:6]] + [eff[j,i,7]])
+    
+    df['rfm_index'] = df['r_grade'] * r_weight + df['f_grade'] * f_weight + df['m_grade'] * m_weight
+    df.to_csv('rfmMLall2.csv',header=True)
     
     # FLOT 0고객수, 1매출액, 2구성비, 3매출기여도, 4기여효과, 5기준, 6등급, 7가중치
-    fig, ax = plt.subplots(2,3,figsize=(16,9))
-    for i in range(0,3):
-        ax[0,i].set_xlabel("grade")
-        ax[0,i].set_ylabel("sales_eff")
-        ax[1,i].set_xlabel("grade")
-        ax[1,i].set_ylabel("contr_eff")
-    ax[0,0].scatter(reff.T[6],reff.T[3])
-    ax[0,0].set_title('R')
-    ax[0,1].scatter(feff.T[6],feff.T[3])
-    ax[0,1].set_title('F')
-    ax[0,2].scatter(meff.T[6],meff.T[3])
-    ax[0,2].set_title('M')
-    ax[1,0].scatter(reff.T[6],reff.T[4])
-    ax[1,0].set_title('R')
-    ax[1,1].scatter(feff.T[6],feff.T[4])
-    ax[1,1].set_title('F')
-    ax[1,2].scatter(meff.T[6],meff.T[4])
-    ax[1,2].set_title('M')
-    #ax[1,1].hist(rfm_index,bins=np.arange(1,11,1))
-    #ax[1,1].set_title('Index')
     if showplt == True:
+        fig, ax = plt.subplots(2,3,figsize=(16,9))
+        for i in range(0,3):
+            ax[0,i].set_xlabel("grade")
+            ax[0,i].set_ylabel("sales_eff")
+            ax[1,i].set_xlabel("grade")
+            ax[1,i].set_ylabel("contr_eff")
+            #ax[0,i].scatter(eff[i].T[6],eff[i].T[3])
+            #ax[1,i].scatter(eff[0].T[6],eff[i].T[4])
+        ax[0,i].set_title('R')
+        ax[0,1].set_title('F')
+        ax[0,2].set_title('M')
+        ax[1,0].set_title('R')
+        ax[1,1].set_title('F')
+        ax[1,2].set_title('M')
+        ax[1,1].hist(df['rfm_index'],bins=np.arange(1,4,0.1))
+        ax[1,1].set_title('Index')
         plt.show()
 
 def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
-    df = pd.read_csv('rfmall.csv',names=['date','id','R','F','M','rc','fc','mc','rfmindex'])
-    Nclass = df['rc'].nunique()
-
+    df = pd.read_csv('rfmMLall.csv',names=['id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
+    Nclass = df['r_grade'].nunique()
+    
     Rmin, Rmax = 0, 366
     Fmin, Fmax = 1, 12
     Mmin, Mmax = 5000, 400000
     Mticks = [10000,30000,100000,300000]
     cmap = 'gist_ncar'
-    colors = [[0.13,0.09,0.23],[0.22,0.17,0.61],[0.47,0.48,0.92],[0.65,0.66,0.98],[0.84,0.85,1]][::-1]
+    colors = [[0.13,0.09,0.23],[0.30,0.28,0.75],[0.55,0.56,0.98],[0.84,0.85,1]][::-1]
     
     fig= plt.figure(figsize=(16,9))
     ax0 = fig.add_subplot(1,2,2, projection='3d')
@@ -386,14 +339,14 @@ def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
     ax4.set_title('R histogram')
     ax4.set_xlabel('Recency')
     for i in range(Nclass):
-        ax4.hist(df.loc[df['rc']==i+1,'R'],bins=(range(Rmin,Rmax,5)),color=colors[i])
+        ax4.hist(df.loc[df['r_grade']==i+1,'R'],bins=(range(Rmin,Rmax,5)),color=colors[i])
 
     ax5 = fig.add_subplot(3,4,6)
     ax5.set_title('F histogram')
     ax5.set_xlabel('Frequency')
     ax5.set_yscale('symlog')
     for i in range(Nclass):
-        ax5.hist(df.loc[df['fc']==i+1,'F'],bins=(range(Fmin,Fmax,1)),color=colors[i])
+        ax5.hist(df.loc[df['f_grade']==i+1,'F'],bins=(range(Fmin,Fmax,1)),color=colors[i])
 
     ax6 = fig.add_subplot(3,4,10)
     ax6.set_title('M histogram')
@@ -402,8 +355,8 @@ def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
     ax6.set_yscale('symlog')
     # ax6.set_xscale('log')
     for i in range(Nclass):
-        # ax6.hist(df.loc[df['mc']==i+1,'M'],bins=(10**np.linspace(np.log10(3000),np.log10(Mmax),200)),color=colors[i])
-        ax6.hist(df.loc[df['mc']==i+1,'M'],bins=(np.linspace(Mmin,Mmax,200)),color=colors[i])
+        # ax6.hist(df.loc[df['m_grade']==i+1,'M'],bins=(10**np.linspace(np.log10(3000),np.log10(Mmax),200)),color=colors[i])
+        ax6.hist(df.loc[df['m_grade']==i+1,'M'],bins=(np.linspace(Mmin,Mmax,200)),color=colors[i])
     
     plt.subplots_adjust(left=0.05,bottom=0.05,top=0.92,right=0.95,hspace=0.35)
     plt.suptitle('RFM scatter', fontsize=16)
@@ -435,7 +388,8 @@ if __name__ == '__main__':
     if True:
     #for time1 in time:
         #getrfm(time1=time1)
-        kmeansrfm()
-        # classrfm(5,time1=time1,showplt=False)
+        # kmeansrfm(showplt=False,showindex=False)
+        # classrfm(4,time1=time1,showplt=False)
+        classrfmML(4,time1=time1,showplt=True)
         # plotrfm(time1=time1,showplt=True)
         #uploadrfm()
