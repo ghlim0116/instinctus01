@@ -391,5 +391,5 @@ if __name__ == '__main__':
         getrfm(time1=time1)
         kmeansrfm(showplt=False,showindex=False)
         classrfmML(4,time1=time1,showplt=False)
-        # plotrfm(time1=time1,showplt=False)
+        # plotrfm(time1=time1,showplt=True)
         uploadrfm()
