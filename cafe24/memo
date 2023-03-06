@@ -1,0 +1,6 @@
+**획득 권한
+**GET financial/dailyvisits
+
+**필요 권한
+**GET financial/dailysales
+**GET paymentgateway
