@@ -44,24 +44,34 @@ try:
         add_yearmonth = add_yearmonth + onemonth
     
     for time1 in time:
+        times = datetime.datetime.now()
+        
         print()
-        stlogger.info('%s ANALYSISING' %(time1))
+        stlogger.info('%s ANALYSING' %(time1))
 
         stlogger.info('GET RFM DATA')
         mylogger.info('%s,GET RFM DATA' %(log.log_no()))
         rfm.getrfm(time1=time1)
         
+        stlogger.info('CLUSTERING')
+        mylogger.info('%s,CLUSTERING' %(log.log_no()))
+        rfm.kmeansrfm(showplt=False,showindex=False)
+
+        stlogger.info('CALCULATE INDICES')
+        mylogger.info('%s,ANALYZING' %(log.log_no()))                
+        rfm.classrfmML(4,time1=time1,showplt=False)
+        
         stlogger.info('PLOT RFM')
         mylogger.info('%s,PLOT RFM' %(log.log_no()))
         rfm.plotrfm(time1=time1,showplt=False)
 
-        stlogger.info('RFM DATA ANALYZING')
-        mylogger.info('%s,RFM DATA ANALYZING' %(log.log_no()))                
-        rfm.classrfm(5,time1=time1,showplt=False)
-
         stlogger.info('UPLOAD RFM DATA TO MARIADB')
         mylogger.info('%s,UPLOAD RFM DATA TO MARIADB' %(log.log_no()))
         rfm.uploadrfm()
+        
+        timef = datetime.datetime.now()
+        elapsed_time = timef - times
+        stlogger.info('%s ELAPSED' %elapsed_time)
     
 except Exception as e:
     errorlogno = log.log_no()

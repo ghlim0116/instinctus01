@@ -12,7 +12,8 @@ sys.path.append("../log")
 import mail
 import log
 
-a = np.array([-1 for a in range(10)])
-df = pd.DataFrame(a,columns=['x'])
-print(len(df))
-
+time1 = '2023-02-01'
+df = pd.read_csv('rfmMLallindex.csv')
+df['date'] = time1
+df = df[['date'] + list(df.columns[:len(df.columns)-1])]
+print(df.head())
