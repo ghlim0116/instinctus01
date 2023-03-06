@@ -1,6 +1,0 @@
-{
-    "access_token":"EAAMMK2qeZAE4BAJO93OEzOSVRZAnNqGZBNjntifR6irdzBb2uBWF2ogA2EhKDAA4KyA4D4XqXsGZCNtzJPH8zS6ijmLkdyyfJsKMiyKugUz05wpthzYf5GsQD3Topq8qMkhlpBt3lVPQeASlqe7KCp4MiZCRfIxFW7R7ZCUkHms5pWC6Pvf7YK4b6fQORPF6ZBh7E8TpuNWyNsRpEUC6mYX",
-    "token_type":"bearer",
-    "expires_in":5100990,
-    "id":"1819500574789105"
-}
