@@ -21,7 +21,6 @@ onemonth = relativedelta(months=1)
 oneyear = relativedelta(months=12)
 
 def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
-    times = datetime.datetime.now()
     time1 = parse(time1)
     oneyearago = (time1 - oneyear).strftime('%Y-%m-%d 00:00:00')
 
@@ -31,8 +30,8 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
     sql += ['''
         SELECT `member_id`
         FROM `cafe24`.`customers`
-        WHERE (`last_login_date` > "%s" or `created_date` > "%s") and `member_id` <> 'commons' and `member_id` <> 'call'
-    ''' %(oneyearago, oneyearago)]
+        WHERE (`last_login_date` > "%s" or `created_date` > "%s") and `created_date` < "%s" and `member_id` <> 'commons' and `member_id` <> 'call'
+    ''' %(oneyearago, oneyearago, time1)]
     cur.execute(sql[0])
     customers = np.array(cur.fetchall())
     print(len(customers),"CUSTOMERS FOUND")
@@ -61,9 +60,6 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
                 csv_writer.writerow([thecustomer[0],R,F,M])
         
     del customers, orders, filter_order, rfmcsv
-    timef = datetime.datetime.now()
-    elapsed_time = timef - times
-    print(elapsed_time, "elapsed")
 
 def kmeansrfm(ks = [4],showplt=False,showindex=False):
     df = pd.read_csv('rfm.csv',names=['id','R','F','M'])
@@ -142,10 +138,7 @@ def kmeansrfm(ks = [4],showplt=False,showindex=False):
                     continue
                 if df_m.loc[i,'cluster1'] == index_before[j]:
                     df_m.loc[i,'cluster'] = index_after[j]
-        
-        print(df_r_describe['R'])
-        print(df_f_describe['F'])
-        print(df_m_describe['M'])
+
         if showplt == True:
             ax[0,k].set_title('R %d' %ks[k])
             ax[0,k].set_xlim(Rmin,Rmax)
@@ -205,29 +198,20 @@ def classrfmML(Nclass=4,time1 = datetime.datetime.now().strftime("%y-%m-01"),sho
     lenrfm = len(df)
     # 6개 순서대로 등급별 0고객수, 1매출액, 2구성비, 3매출기여도, 4기여효과, 5기준, 6등급, 7가중치
     eff = np.zeros(shape=(3,Nclass,8))
+    rfm = ['R','F','M']
+    rfm_grade = ['r_grade','f_grade','m_grade']
     for i in range(Nclass):
         for j in range(3): # eff[0]: R, eff[1]: F, eff[2]: M
-            if j == 0:
-                eff[0,i,0] = df.groupby(by='r_grade')['R'].describe().loc[i+1,'count']
-                eff[0,i,1] = df.loc[df['r_grade'] == i+1,'M'].sum()
-                eff[j,i,5] = df.groupby(by='r_grade')['R'].describe().loc[i+1,'min']
-            elif j == 1:
-                eff[1,i,0] = df.groupby(by='f_grade')['F'].describe().loc[i+1,'count']
-                eff[1,i,1] = df.loc[df['f_grade'] == i+1,'M'].sum()
-                eff[j,i,5] = df.groupby(by='f_grade')['F'].describe().loc[i+1,'min']
-            elif j == 2:
-                eff[2,i,0] = df.groupby(by='m_grade')['M'].describe().loc[i+1,'count']
-                eff[2,i,1] = df.loc[df['m_grade'] == i+1,'M'].sum()
-                eff[j,i,5] = df.groupby(by='m_grade')['M'].describe().loc[i+1,'min']
+            eff[j,i,0] = df.groupby(by=rfm_grade[j])[rfm[j]].describe().loc[i+1,'count']
+            eff[j,i,1] = df.loc[df[rfm_grade[j]] == i+1,'M'].sum()
+            eff[j,i,5] = df.groupby(by=rfm_grade[j])[rfm[j]].describe().loc[i+1,'min']
             eff[j,i,2] = eff[j,i,0]/lenrfm
             eff[j,i,3] = eff[j,i,1]/sumpayment
-            eff[j,i,4] = eff[j,i,3] / eff[j,i,2]            
+            eff[j,i,4] = eff[j,i,3] / eff[j,i,2]
             eff[j,i,6] = i+1
     
     # 등급과 기여효과 회귀선의 기울기로 가중치 구하기
-    rpf = np.polyfit(eff[0].T[6],eff[0].T[4],1)
-    fpf = np.polyfit(eff[1].T[6],eff[1].T[4],1)
-    mpf = np.polyfit(eff[2].T[6],eff[2].T[4],1)
+    rpf, fpf, mpf = [np.polyfit(eff[i].T[6],eff[i].T[4],1) for i in range(3)]
     rfm_weight = rpf[0] + fpf[0] + mpf[0]
     r_weight = rpf[0] / rfm_weight
     f_weight = fpf[0] / rfm_weight
@@ -235,19 +219,36 @@ def classrfmML(Nclass=4,time1 = datetime.datetime.now().strftime("%y-%m-01"),sho
     eff[0,:,7] = r_weight
     eff[1,:,7] = f_weight
     eff[2,:,7] = m_weight
-    print(eff)
     
     # RFM class 저장
     with open('rfmMLclass.csv','w') as rfmclasscsv:
         csv_writer = csv.writer(rfmclasscsv)
-        rfm = ['R','F','M']
+        rfmMLclass_header = ['date','RFM','grade','count','sales','fraction','sales_contr','contr_eff','min','weight']
+        csv_writer.writerow(rfmMLclass_header)
         for j in range(3):
             for i in range(Nclass):
                 csv_writer.writerow([time1] + [rfm[j]] + [int(eff[j,i,6])] + [x for x in eff[j,i,:6]] + [eff[j,i,7]])
     
     df['rfm_index'] = df['r_grade'] * r_weight + df['f_grade'] * f_weight + df['m_grade'] * m_weight
-    df.to_csv('rfmMLall2.csv',header=True)
-    
+    for i in range(lenrfm):    
+        if df.loc[i,'r_grade'] >= 3:
+            if df.loc[i,'f_grade'] >= 3:
+                if df.loc[i,'m_grade'] >= 3:
+                    df.loc[i,'group'] = 'VIP'
+                else:
+                    df.loc[i,'group'] = 'ROYAL'
+            elif df.loc[i,'m_grade'] >= 3:
+               df.loc[i,'group'] = 'semi-VIP'
+            else:
+                df.loc[i,'group'] = 'new'
+        elif df.loc[i,'m_grade'] >= 3:
+            df.loc[i,'group'] = 'esc-VIP'
+        else:
+            df.loc[i,'group'] = 'esc'
+    df['date'] = time1
+    df = df[['date'] + list(df.columns[:len(df.columns)-1])]
+    df.to_csv('rfmMLallindex.csv',header=True,index=False)
+
     # FLOT 0고객수, 1매출액, 2구성비, 3매출기여도, 4기여효과, 5기준, 6등급, 7가중치
     if showplt == True:
         fig, ax = plt.subplots(2,3,figsize=(16,9))
@@ -369,8 +370,8 @@ def uploadrfm():
     conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
     cur = conn.cursor()
     sql = []
-    sql += [log.sqlquery(filename="rfmall.csv",database="cafe24",table="rfm",ignorelines="0",columns="`date`,`member_id`,`r`,`f`,`m`,`r_grade`,`f_grade`,`m_grade`,`rfm_index`")]
-    sql += [log.sqlquery(filename="rfmclass.csv",database="cafe24",table="rfmclass",ignorelines="0",columns="`date`,`rfm`,`class`,`members`,`sales`,`fraction`,`sales_cont`,`cont_eff`,`criteria`,`weight`")]
+    sql += [log.sqlquery(filename="rfmMLallindex.csv",database="cafe24",table="rfm",ignorelines="1",linedivider="\n",columns="`date`,`member_id`,`r`,`f`,`m`,`r_grade`,`f_grade`,`m_grade`,`rfm_index`,`group`")]
+    sql += [log.sqlquery(filename="rfmMLclass.csv",database="cafe24",table="rfmclass",ignorelines="1",columns="`date`,`rfm`,`class`,`members`,`sales`,`fraction`,`sales_cont`,`cont_eff`,`criteria`,`weight`")]
     for s in sql:
         cur.execute(s)
     conn.commit()
@@ -384,12 +385,11 @@ if __name__ == '__main__':
         time += [add_yearmonth.strftime('%Y-%m-%d')]
         add_yearmonth = add_yearmonth + onemonth
     
-    time1 = '2023-02-01'
-    if True:
-    #for time1 in time:
-        #getrfm(time1=time1)
-        # kmeansrfm(showplt=False,showindex=False)
-        # classrfm(4,time1=time1,showplt=False)
-        classrfmML(4,time1=time1,showplt=True)
-        # plotrfm(time1=time1,showplt=True)
-        #uploadrfm()
+    # time1 = '2023-02-01'
+    # if True:
+    for time1 in time:
+        getrfm(time1=time1)
+        kmeansrfm(showplt=False,showindex=False)
+        classrfmML(4,time1=time1,showplt=False)
+        # plotrfm(time1=time1,showplt=False)
+        uploadrfm()
