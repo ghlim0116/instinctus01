@@ -270,7 +270,7 @@ def classrfmML(Nclass=4,time1 = datetime.datetime.now().strftime("%y-%m-01"),sho
         ax[1,1].set_title('Index')
         plt.show()
 
-def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
+def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=False):
     df = pd.read_csv('rfmMLall.csv',names=['member_id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
     Nclass = df['r_grade'].nunique()
     
@@ -378,7 +378,7 @@ def uploadrfm():
     conn.commit()
     conn.close()
 
-def contactrfm(time1=""):
+def contactrfm(time1="",To=[],CC=[]):
     df = pd.read_csv('rfmMLallindex.csv',header=0)
     filter_customers = np.array(df['member_id'],dtype=str)
     filter_customers = "','".join(filter_customers)
@@ -426,7 +426,7 @@ Office Hours: from 09:00 to 18:00 (Lunch : 12:30 - 13:30)
 이 메시지(첨부파일 포함)는 지정된 수신인에게만 전달될 목적으로 발송되었으며, 부정경쟁방지 및 영업비밀의 보호에 관한 법률 등 관계법령에 따라 법으로 보호되는 중요한 정보를 담고 있을 수 있습니다. 이 메시지와 첨부 파일등에 있어서, 공개, 복사, 배포 또는 기재된 내용을 근거로한 일체의 행동등의 2차 활용에 대해서는 메일 발신자에게 확인을 받아야 하며, 메일 발신자의 확인이 없는 2차 활용 등은 엄격히 금지되어 있음을 주지하시기 바랍니다. 만약 이 메시지가 잘못 전송되었을 경우, 발신인 또는 당사에 알려주시고, 본 메시지를 즉시 삭제하여 주시기 바랍니다.
 This message (including any attachments) contains confidential information intended for a specific individual and purpose and is protected by law. If you are not the intended recipient, you should delete this message and are hereby notified any disclosure, copying or distribution of this message, or the taking of any action based on it is strictly prohibited
     """ % time1
-    mail.mail(subject="%s RFM 분석 결과 전달의 건" % time1,body=body,To=["sohee.gwak@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"],attachments=["/home/instinctus/Desktop/rfm/rfmMLcontacts.csv"])
+    mail.mail(subject="%s RFM 분석 결과 전달의 건" % time1,body=body,To=To,CC=CC,attachments=["/home/instinctus/Desktop/rfm/rfmMLcontacts.csv"])
 
 if __name__ == '__main__':
     time = []
@@ -436,12 +436,12 @@ if __name__ == '__main__':
         time += [add_yearmonth.strftime('%Y-%m-%d')]
         add_yearmonth = add_yearmonth + onemonth
     
-    time1 = '2023-03-01'
+    time1 = datetime.datetime.now().strftime("%Y-%m-01")
     if True:
     # for time1 in time:
-        # getrfm(time1=time1)
-        # kmeansrfm(showplt=False,showindex=False)
-        # classrfmML(4,time1=time1,showplt=False)
+        getrfm(time1=time1)
+        kmeansrfm(showplt=False,showindex=False)
+        classrfmML(4,time1=time1,showplt=False)
         # plotrfm(time1=time1,showplt=False)
-        # uploadrfm()
-        # contactrfm(time1=time1)
+        uploadrfm()
+        contactrfm(time1=time1,To=["sohee.gwak@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"])
