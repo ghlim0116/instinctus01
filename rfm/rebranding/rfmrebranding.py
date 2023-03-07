@@ -14,8 +14,9 @@ import seaborn as sns
 import pickle
 from dateutil.parser import parse
 import sys
-sys.path.append("../../log")
+sys.path.append("../log")
 import log
+import mail
 
 onemonth = relativedelta(months=1)
 oneyear = relativedelta(months=12)
@@ -380,6 +381,28 @@ def uploadrfm():
     conn.commit()
     conn.close()
     
+def contactrfm(time1="",To=[],CC=[]):
+    df = pd.read_csv('./rebranding/mid rfmMLallindex.csv',header=0)
+    filter_customers = np.array(df['member_id'],dtype=str)
+    filter_customers = "','".join(filter_customers)
+    filter_customers = "('" + filter_customers + "')"
+
+    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    cur = conn.cursor()
+    sql = []
+    sql += ['''
+        SELECT `member_id`,`name`,`cellphone`,`email`,`sms`,`news_mail`
+        FROM `cafe24`.`customers`
+        WHERE `member_id` in %s
+    ''' %(filter_customers)]
+    sql_query = pd.read_sql_query(sql[0],conn)
+    customers = pd.DataFrame(sql_query)
+    conn.close()
+    df = pd.merge(df,customers,on='member_id')
+    df.to_csv('./rebranding/mid rfmMLcontacts.csv',index=False,header=True,encoding='utf-8-sig')
+    del customers, filter_customers
+    
+
 if __name__ == '__main__':
     time = []
     start_yearmonth = datetime.date(year=2022,month=11,day=1)
@@ -389,10 +412,45 @@ if __name__ == '__main__':
         add_yearmonth = add_yearmonth + onemonth
     
     time1 = '2023-03-02'
-    if True:
+    # if True:
     # for time1 in time:
-        getrfm(time1=time1)
-        kmeansrfm(showplt=False,showindex=False)
-        classrfmML(4,time1=time1,showplt=False)
-        plotrfm(time1=time1,showplt=True)
+        # getrfm(time1=time1)
+        # kmeansrfm(showplt=False,showindex=False)
+        # classrfmML(4,time1=time1,showplt=False)
+        # plotrfm(time1=time1,showplt=False)
         # uploadrfm()
+        # contactrfm()
+    
+    body = """
+안녕하세요
+데이터팀 임건호입니다.
+
+리브랜딩 전후 RFM 등급 분석 결과 및 고객 연락처를 전달드립니다.
+리브랜딩 전에는 R 등급 산출 기간이 1년이지만, 리브랜딩 후의 R 등급 산출 기간은 약 240 정도로 차이가 있음을 참고 바랍니다.
+
+before rfmMLcontacts.csv - 리브랜딩 직전 날 기준 RFM 등급(2021-07-26 ~ 2022-07-25)
+after1 rfmMLcontacts.csv - 리브랜딩 프로모션 기간을 포함한 RFM 등급(2022-07-26 ~ 2023-03-01)
+after2 rfmMLcontacts.csv - 리브랜딩 프로모션 기간을 포함하지 않은 RFM 등급(2022-08-09 ~ 2023-03-01)
+
+자세한 사항은 첨부 파일을 확인하시기 바랍니다.
+추가 요청 사항이나 궁금하신 점은 편하신 방법으로 저에게 회신주시면 됩니다.
+
+감사합니다
+임건호 드림
+________________________________________________________
+
+임건호 | Lim, Geonho (he/him/his)
+성장운영본부, 데이터팀 | Growth & Operation division, Data team
+(주) 인스팅터스 / Instinctus Co., Ltd.
+
+T: +82) 70-4333-4440, +82) 10-8998-2043
+A: 서울특별시 성동구 왕십리로 115, 헤이그라운드 서울숲점 6층 G602
+    G602 6th Floor, 115, Wangsimni-ro, Seongdong-gu, Seoul, Republic of Korea
+F: 경기도 하남시 조정대로 45(풍산동) 8층 810호,811호
+    no810-811, 45, Jojeong-daero, Hanam-si, Gyeonggi-do, Republic of Korea
+Office Hours: from 09:00 to 18:00 (Lunch : 12:30 - 13:30)
+
+이 메시지(첨부파일 포함)는 지정된 수신인에게만 전달될 목적으로 발송되었으며, 부정경쟁방지 및 영업비밀의 보호에 관한 법률 등 관계법령에 따라 법으로 보호되는 중요한 정보를 담고 있을 수 있습니다. 이 메시지와 첨부 파일등에 있어서, 공개, 복사, 배포 또는 기재된 내용을 근거로한 일체의 행동등의 2차 활용에 대해서는 메일 발신자에게 확인을 받아야 하며, 메일 발신자의 확인이 없는 2차 활용 등은 엄격히 금지되어 있음을 주지하시기 바랍니다. 만약 이 메시지가 잘못 전송되었을 경우, 발신인 또는 당사에 알려주시고, 본 메시지를 즉시 삭제하여 주시기 바랍니다.
+This message (including any attachments) contains confidential information intended for a specific individual and purpose and is protected by law. If you are not the intended recipient, you should delete this message and are hereby notified any disclosure, copying or distribution of this message, or the taking of any action based on it is strictly prohibited
+    """
+    mail.mail(subject="리브랜딩 전후 RFM 분석 결과 전달의 건",body=body,To=["sohee.gwak@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"],attachments=["/home/instinctus/Desktop/rfm/rebranding/before rfmMLcontacts.csv","/home/instinctus/Desktop/rfm/rebranding/after1 rfmMLcontacts.csv","/home/instinctus/Desktop/rfm/rebranding/after2 rfmMLcontacts.csv"])

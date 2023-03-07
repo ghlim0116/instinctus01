@@ -1,4 +1,4 @@
-date,id,R,F,M,r_grade,f_grade,m_grade,rfm_index,group
+date,member_id,R,F,M,r_grade,f_grade,m_grade,rfm_index,group
 2022-07-26,100004207@n,237,1,33733.0,2,1,1,1.0543118531127325,esc
 2022-07-26,100007313@n,226,1,31500.0,2,1,1,1.0543118531127325,esc
 2022-07-26,10017164@n,348,1,38713.0,1,1,1,1.0,esc
