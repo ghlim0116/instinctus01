@@ -16,6 +16,7 @@ from dateutil.parser import parse
 import sys
 sys.path.append("../log")
 import log
+import mail
 
 onemonth = relativedelta(months=1)
 oneyear = relativedelta(months=12)
@@ -62,7 +63,7 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
     del customers, orders, filter_order, rfmcsv
 
 def kmeansrfm(ks = [4],showplt=False,showindex=False):
-    df = pd.read_csv('rfm.csv',names=['id','R','F','M'])
+    df = pd.read_csv('rfm.csv',names=['member_id','R','F','M'])
     
     # elbow point
     # df_r = df[['R']]
@@ -191,7 +192,7 @@ def kmeansrfm(ks = [4],showplt=False,showindex=False):
 
 def classrfmML(Nclass=4,time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=False):
     # 데이터 불러오기
-    df = pd.read_csv('rfmMLall.csv',names=['id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
+    df = pd.read_csv('rfmMLall.csv',names=['member_id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
     
     # raise SystemError
     sumpayment = df['M'].sum()
@@ -270,7 +271,7 @@ def classrfmML(Nclass=4,time1 = datetime.datetime.now().strftime("%y-%m-01"),sho
         plt.show()
 
 def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
-    df = pd.read_csv('rfmMLall.csv',names=['id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
+    df = pd.read_csv('rfmMLall.csv',names=['member_id','R','F','M','r_grade','f_grade','m_grade'],skiprows=1)
     Nclass = df['r_grade'].nunique()
     
     Rmin, Rmax = 0, 366
@@ -376,7 +377,30 @@ def uploadrfm():
         cur.execute(s)
     conn.commit()
     conn.close()
+
+def contactrfm():
+    df = pd.read_csv('rfmMLallindex.csv',header=0)
+    filter_customers = np.array(df['member_id'],dtype=str)
+    filter_customers = "','".join(filter_customers)
+    filter_customers = "('" + filter_customers + "')"
+
+    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    cur = conn.cursor()
+    sql = []
+    sql += ['''
+        SELECT `member_id`,`name`,`cellphone`,`email`,`sms`,`news_mail`
+        FROM `cafe24`.`customers`
+        WHERE `member_id` in %s
+    ''' %(filter_customers)]
+    sql_query = pd.read_sql_query(sql[0],conn)
+    customers = pd.DataFrame(sql_query)
+    conn.close()
+    df = pd.merge(df,customers,on='member_id')
+    df.to_csv('rfmMLcontacts.csv',index=False,header=True,encoding='utf-8-sig')
+    del customers, filter_customers
     
+    mail.mail(subject="Test1",body="Test1",To="geonho.lim@cheremimaka.com",attachments=["/home/instinctus/Desktop/rfm/rfmMLcontacts.csv"])
+
 if __name__ == '__main__':
     time = []
     start_yearmonth = datetime.date(year=2022,month=11,day=1)
@@ -385,11 +409,12 @@ if __name__ == '__main__':
         time += [add_yearmonth.strftime('%Y-%m-%d')]
         add_yearmonth = add_yearmonth + onemonth
     
-    # time1 = '2023-02-01'
-    # if True:
-    for time1 in time:
-        getrfm(time1=time1)
-        kmeansrfm(showplt=False,showindex=False)
-        classrfmML(4,time1=time1,showplt=False)
-        # plotrfm(time1=time1,showplt=True)
-        uploadrfm()
+    time1 = '2023-03-01'
+    if True:
+    # for time1 in time:
+        # getrfm(time1=time1)
+        # kmeansrfm(showplt=False,showindex=False)
+        # classrfmML(4,time1=time1,showplt=False)
+        # plotrfm(time1=time1,showplt=False)
+        # uploadrfm()
+        contactrfm()
