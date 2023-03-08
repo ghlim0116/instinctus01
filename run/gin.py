@@ -66,7 +66,7 @@ while True:
         mylogger.info('''%s,"%s"''' %(errorlogno,e))
         stlogger.info('* !!!!!!!!! AN ERROR OCCURED !!!!!!!!! *')
         errorlogger.error('%s,"%s","%s"' %(errorlogno, str(e), traceback.format_exc().replace('"',"'")))
-        mail.mail(subject="GIN Data Pipeline Error: %s" %(str(e)),body=traceback.format_exc().replace('"',"'"),To="geonho.lim@cheremimaka.com")
+        mail.mail(subject="GIN Data Pipeline Error: %s" %(str(e)),body=traceback.format_exc().replace('"',"'"),To=["geonho.lim@cheremimaka.com"])
     finally:
         conn = pymysql.connect(host = '172.16.2.211',port=3306,database='log',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
         cur = conn.cursor()

@@ -1,11 +1,16 @@
 import smtplib
 from email.mime.text import MIMEText
+from email.header import Header
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.encoders import encode_base64
+import os
 import json
 
 def Keyerror(msg=""):
     raise KeyError(msg)
 
-def mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To="",CC=""):
+def mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To=[],CC=[],attachments=[]):
     if subject == "":
         Keyerror("제목을 입력하십시오")
     elif body == "":
@@ -13,11 +18,23 @@ def mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To="",CC=""):
     elif To == "":
         Keyerror("수신자를 입력하십시오")
     
-    subject = subject
-    body = body
-    From = From
-    To = To
-    CC = CC
+    msg = MIMEMultipart()
+    msg['Subject'] = Header(s=subject,charset='utf-8')
+    attach_msg = MIMEText(body,_charset='utf-8')
+    msg.attach(attach_msg)
+    msg['From'] = From
+    msg['To'] = ",".join(To)
+    msg['CC'] = ",".join(CC)
+    if CC != []:
+        To = To + CC
+    if attachments != "":
+        files = attachments
+        for f in files:
+            part = MIMEBase('application',"octet-stream")
+            part.set_payload(open(f,"rb").read())
+            encode_base64(part)
+            part.add_header('Content-Disposition','attachment; filename="%s"' % os.path.basename(f))
+            msg.attach(part)
 
     with open('/home/instinctus/Desktop/log/outlookIDPW.json','r',encoding='utf-8') as IDPW:
         IDPW = json.load(IDPW)
@@ -29,13 +46,8 @@ def mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To="",CC=""):
     smtp.starttls()  # TLS 사용시 필요
     smtp.login(ID,PW)
 
-    msg = MIMEText(body)
-    msg['Subject'] = subject
-    msg['To'] = To
-    msg['CC'] = CC
-
     smtp.sendmail(From, To, msg.as_string())
     smtp.quit()
 
 if __name__=='__main__':
-    mail(subject="Test",body="Test",To="geonho.lim@cheremimaka.com")
+    mail(subject="Test",body="Test",To=["temp.lim@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"],attachments=[])
