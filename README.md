@@ -21,7 +21,7 @@ Import shopping mall visit counts from GA4, followed counts from Instagram, keyw
     /run/gin.py
     
 ### RFM analysis
-1년 이내에 한 번이라도 주문한 적이 있는 고객들의 RFM 모델을 분석합니다.  
+최근 1년 이내에 한 번이라도 주문한 적이 있는 고객들의 RFM 모델을 분석합니다.  
 Analyze RFM model of customers who placed an order at least once within a year.
 
     /rfm/runrfm.py
