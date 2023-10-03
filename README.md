@@ -17,7 +17,6 @@ Import homepage visit counts from GA, followed count from Instagram, keyword que
 Get RFM model of customers who placed an order at least once within a year.
 
     /rfm/runrfm.py
-***
 
 ## Modules
 ***
