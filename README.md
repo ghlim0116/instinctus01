@@ -1,7 +1,6 @@
 # Instinctus Data pipeline
 
 ## How to run
-***
 
 ### cafe24
 Import data from cafe24
@@ -19,7 +18,7 @@ Get RFM model of customers who placed an order at least once within a year.
     /rfm/runrfm.py
 
 ## Modules
-***
+
 send mail
 
     from log import mail
