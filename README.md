@@ -16,7 +16,7 @@ Import data from cafe24
 
 ### GA, Naver, Instagram
 
-GA에서 인터넷 쇼핑몰 방문자 수, 네이버 검색광고에서 키워드 검색량, 인스타그램에서 팔로워 수를 가져옵니다.
+GA에서 인터넷 쇼핑몰 방문자<https://cheremimaka.com/> 수, 네이버 검색광고에서 키워드 검색량, 인스타그램에서 팔로워 수를 가져옵니다.
 
 Import shopping mall visit counts from GA, followed count from Instagram, keyword query count from Naver searchad.
 
