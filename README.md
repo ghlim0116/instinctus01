@@ -1,5 +1,11 @@
 # Instinctus Data pipeline
 
+(주)인스팅터스의 매출 분석을 위해 Cafe24, GA, Instagram, Naver searchad에서 데이터를 가져오는 파이프라인입니다.
+
+## Development
+
+python3
+
 ## How to run
 
 ### cafe24
@@ -17,7 +23,7 @@ Get RFM model of customers who placed an order at least once within a year.
 
     /rfm/runrfm.py
 
-## Modules
+### Modules
 
 send mail
 
