@@ -3,7 +3,7 @@
 (주)인스팅터스의 매출 분석을 목적으로 한 데이터 파이프라인입니다.
 Cafe24, GA, Naver searchad, Instagram에서 데이터를 가져오고, 고객의 RFM 모델을 분석합니다.
 
-## Development
+## Developments
 
 python3, SQL
 
