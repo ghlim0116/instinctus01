@@ -9,12 +9,13 @@ python3, SQL
 ## How to run
 
 ### cafe24
-Import data from cafe24
+Cafe24에서 고객 개인정보, 주문내역, 가입·탈퇴·휴면 내역, 상품정보, 쿠폰 이용내역 등의 데이터를 가져옵니다.
+Import data of customer information, orders, membership registration/cancellation/dormantness, products, coupons etc. from Cafe24.
 
     /cafe24/cafe24.py
 
 ### GA4, Instagram, Naver
-GA4에서 [인터넷 쇼핑몰](https://cheremimaka.com/) 방문자 수, 인스타그램에서 팔로워 수, 네이버 검색광고에서 키워드 검색량을 가져옵니다.  
+GA4에서 [체레미 마카](https://cheremimaka.com/) 인터넷 쇼핑몰 방문자 수, 인스타그램에서 팔로워 수, 네이버 검색광고에서 키워드 검색량을 가져옵니다.  
 Import shopping mall visit counts from GA4, followed counts from Instagram, keywords query counts from Naver searchad.  
 
     /run/gin.py
