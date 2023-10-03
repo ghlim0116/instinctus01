@@ -9,7 +9,7 @@ python3, SQL
 ## How to run
 
 ### cafe24
-Cafe24에서 고객 개인정보, 주문내역, 가입·탈퇴·휴면 내역, 상품정보, 쿠폰 이용내역 등의 데이터를 가져옵니다.
+Cafe24에서 고객 개인정보, 주문내역, 가입·탈퇴·휴면 내역, 상품정보, 쿠폰 이용내역 등의 데이터를 가져옵니다.  
 Import data of customer information, orders, membership registration/cancellation/dormantness, products, coupons etc. from Cafe24.
 
     /cafe24/cafe24.py
