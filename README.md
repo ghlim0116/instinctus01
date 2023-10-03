@@ -24,16 +24,9 @@ Get RFM model of customers who placed an order at least once within a year.
 send mail
 
     from log import mail
-    mail.mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To=[],CC=[],attachments=[])
-fasdf
+    mail.mail(subject="subject",body="body",From="your email address",To=["reciever's email address"],CC=["CC's email address"],attachments=[attachment1,attachment2])
 
-    /log/mail.py
-
-
-
-
-
-
-from log import log
 generate log no.
-log_no()
+
+    from log import log
+    log_no()
