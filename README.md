@@ -5,7 +5,7 @@ Cafe24, GA, Naver searchad, Instagram에서 데이터를 가져오고, 고객의
 
 ## Development
 
-python3
+python3, SQL
 
 ## How to run
 
