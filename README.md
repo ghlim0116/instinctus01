@@ -22,7 +22,7 @@ Get RFM model of customers who placed an order at least once within a year.
 send mail
 
     from log import mail
-    mail.mail(subject="subject",body="body",From="your email address",To=["reciever's email address"],CC=["CC's email address"],attachments=[attachment1,attachment2])
+    mail.mail(subject="SUBJECT",body="BODY",From="YOUR EMAIL ADDRESS",To=["RECEIVER"S EMAIL ADDRESS"],CC=["CC'S EMAIL ADDRESS"],attachments=["ATTACHMENT"])
 
 generate log no.
 
