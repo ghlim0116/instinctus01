@@ -2,17 +2,27 @@
 
 ## How to run
 ***
+
 ### cafe24
-#### Import data from cafe24
+Import data from cafe24
+
     /cafe24/cafe24.py
+
 ### GA, Instagram, Naver
-#### GA: Visit count
-#### Instagram: followed count
-#### Naver: keyword query count
+Import homepage visit counts from GA, followed count from Instagram, keyword query count from Naver searchad.
+
     /run/gin.py
+    
 ### RFM analysis
+Get RFM model of customers who placed an order at least once within a year.
+
     /rfm/runrfm.py
 ***
+
 ## Modules
+***
+asfdadsf
     /log/log.py
+fasdf
+
     /log/mail.py
