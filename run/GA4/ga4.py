@@ -29,7 +29,7 @@ def ga4():                                                         ### 특정 �
             sql += [log.sqlquery(filename="/home/instinctus/Desktop/run/GA4/searchterm.csv",database="ga4",table="searchterm",linedivider="\r\n",ignorelines="1",columns="`date`,`searchterm`,`activeUsers`")]
             sql += [log.sqlquery(filename="/home/instinctus/Desktop/run/GA4/sourcemedium.csv",database="ga4",table="sourcemedium",linedivider="\r\n",ignorelines="1",columns="`date`,`source`,`medium`,`sourcePlatform`,`activeUsers`")]
             
-            conn = pymysql.connect(host = '172.16.2.211',port=3306,database='ga4',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+            conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
             cur = conn.cursor()
             for cmd in sql:
                 cur.execute(cmd)
