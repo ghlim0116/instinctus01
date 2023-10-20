@@ -1,1 +1,1 @@
-{'access_token': 'IGQVJXRHZADeTBMa1BiLWRPSjRhTE1hbmZAGbF80Q1FEWWV5cTVVMlFRUnppTENwdmN5bXVaSklobFNVenhvd3lyVHQwbHdCLWxmUS01NGtoYmJ5VUF1VlhlbVpLY0pkSlRyeFlOaENR', 'token_type': 'bearer', 'expires_in': 5105923, 'user_id': 17841406838763700}
+{'access_token': '', 'token_type': 'bearer', 'expires_in': 5105923, 'user_id': ***********************}
