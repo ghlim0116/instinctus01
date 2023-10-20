@@ -63,7 +63,7 @@ if __name__ == '__main__': # 로그 기록 샘플 코드
         errorlogger.error('%s,%s,"%s"' %(errorlogno, str(e), traceback.format_exc().replace('"',"'")))
         
     finally:
-        conn = pymysql.connect(host = '172.16.2.211',port=3306,database='log',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+        conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
         cur = conn.cursor()
         sql = []
         sql += [sqlquery(filename="log.csv",database="log",table="log",columns="`filename`,`loglevel`,`log_no`,`message`,`datetime`",linedivider="\\n",ignorelines="0")]
