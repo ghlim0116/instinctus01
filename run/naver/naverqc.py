@@ -15,9 +15,9 @@ def get_header(method, uri, api_key, secret_key, customer_id):
 
 def naverqc():
     BASE_URL = 'https://api.searchad.naver.com'
-    API_KEY = '0100000000c51d2923cd8745d9f4faf1daccd7b14423f6c314bce85c769e0c30b38c53e96c'
-    SECRET_KEY = 'AQAAAADFHSkjzYdF2fT68drM17FEqLRUWKac99NI3SHqQbEhdw=='
-    CUSTOMER_ID = '829946'
+    API_KEY = ''
+    SECRET_KEY = ''
+    CUSTOMER_ID = ''
     method = 'GET'
     uri = '/keywordstool'
     oneday = datetime.timedelta(days=1)
@@ -25,7 +25,7 @@ def naverqc():
     time1 = datetime.datetime.now()
 
     # get data from MariaDB
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='keywordqc',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = '''SELECT `keywords` FROM `keywordqc`.`keywords`'''
     cur.execute(sql)
@@ -68,7 +68,7 @@ def naverqc():
     (`date`,`portal`,`relKeyword`,`monthlyPcQcCnt`,`monthlyMobileQcCnt`,`monthlyAvePcClkCnt`,`monthlyAveMobileClkCnt`,`monthlyAvePcCtr`,`monthlyAveMobileCtr`,`plAvgDepth`,`compIdx`,`sumQcCnt`);
     """
 
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='keywordqc',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     cur.execute(sql)
     conn.commit()
