@@ -26,7 +26,7 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
     # oneyearago = (time1 - oneyear).strftime('%Y-%m-%d 00:00:00')
     oneyearago = '2022-08-09 00:00:00'
 
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += ['''
@@ -371,7 +371,7 @@ def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=True):
         plt.show()
 
 def uploadrfm():
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += [log.sqlquery(filename="rfmMLallindex.csv",database="cafe24",table="rfm",ignorelines="1",linedivider="\n",columns="`date`,`member_id`,`r`,`f`,`m`,`r_grade`,`f_grade`,`m_grade`,`rfm_index`,`group`")]
@@ -387,7 +387,7 @@ def contactrfm(time1="",To=[],CC=[]):
     filter_customers = "','".join(filter_customers)
     filter_customers = "('" + filter_customers + "')"
 
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += ['''
@@ -453,4 +453,4 @@ Office Hours: from 09:00 to 18:00 (Lunch : 12:30 - 13:30)
 이 메시지(첨부파일 포함)는 지정된 수신인에게만 전달될 목적으로 발송되었으며, 부정경쟁방지 및 영업비밀의 보호에 관한 법률 등 관계법령에 따라 법으로 보호되는 중요한 정보를 담고 있을 수 있습니다. 이 메시지와 첨부 파일등에 있어서, 공개, 복사, 배포 또는 기재된 내용을 근거로한 일체의 행동등의 2차 활용에 대해서는 메일 발신자에게 확인을 받아야 하며, 메일 발신자의 확인이 없는 2차 활용 등은 엄격히 금지되어 있음을 주지하시기 바랍니다. 만약 이 메시지가 잘못 전송되었을 경우, 발신인 또는 당사에 알려주시고, 본 메시지를 즉시 삭제하여 주시기 바랍니다.
 This message (including any attachments) contains confidential information intended for a specific individual and purpose and is protected by law. If you are not the intended recipient, you should delete this message and are hereby notified any disclosure, copying or distribution of this message, or the taking of any action based on it is strictly prohibited
     """
-    mail.mail(subject="리브랜딩 전후 RFM 분석 결과 전달의 건",body=body,To=["sohee.gwak@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"],attachments=["/home/instinctus/Desktop/rfm/rebranding/before rfmMLcontacts.csv","/home/instinctus/Desktop/rfm/rebranding/after1 rfmMLcontacts.csv","/home/instinctus/Desktop/rfm/rebranding/after2 rfmMLcontacts.csv"])
+    mail.mail(subject="리브랜딩 전후 RFM 분석 결과 전달의 건",body=body,To=["********@cheremimaka.com"],CC=["********@cheremimaka.com"],attachments=["/home/instinctus/Desktop/rfm/rebranding/before rfmMLcontacts.csv","/home/instinctus/Desktop/rfm/rebranding/after1 rfmMLcontacts.csv","/home/instinctus/Desktop/rfm/rebranding/after2 rfmMLcontacts.csv"])
