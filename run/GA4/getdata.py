@@ -12,7 +12,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
 
-def run_report(property_id="326395343",date1=""):
+def run_report(property_id="********",date1=""):
     oneday = datetime.timedelta(days=1)
     if date1:
         date1 = parse(date1).date().strftime("%Y-%m-%d")
@@ -22,7 +22,7 @@ def run_report(property_id="326395343",date1=""):
     with open('/home/instinctus/Desktop/run/GA4/DimensionsandMetrics.json','r') as f:
         DimensionsandMetrics = json.loads(f.read())
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "/home/instinctus/Desktop/run/GA4/credentials.json"
-    property_id = "326395343"
+    property_id = "*********"
     client = BetaAnalyticsDataClient()
     
     for DMMT in DimensionsandMetrics['data']:
