@@ -25,7 +25,7 @@ def getrfm(time1 = datetime.datetime.now().strftime("%y-%m-01")):
     time1 = parse(time1)
     oneyearago = (time1 - oneyear).strftime('%Y-%m-%d 00:00:00')
 
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += ['''
@@ -368,7 +368,7 @@ def plotrfm(time1 = datetime.datetime.now().strftime("%y-%m-01"),showplt=False):
         plt.show()
 
 def uploadrfm():
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += [log.sqlquery(filename="rfmMLallindex.csv",database="cafe24",table="rfm",ignorelines="1",linedivider="\n",columns="`date`,`member_id`,`r`,`f`,`m`,`r_grade`,`f_grade`,`m_grade`,`rfm_index`,`group`")]
@@ -384,7 +384,7 @@ def contactrfm(time1="",To=[],CC=[]):
     filter_customers = "','".join(filter_customers)
     filter_customers = "('" + filter_customers + "')"
 
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += ['''
@@ -444,4 +444,4 @@ if __name__ == '__main__':
         classrfmML(4,time1=time1,showplt=False)
         # plotrfm(time1=time1,showplt=False)
         uploadrfm()
-        contactrfm(time1=time1,To=["sohee.gwak@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"])
+        contactrfm(time1=time1,To=["******@cheremimaka.com"],CC=["********@cheremimaka.com"])
