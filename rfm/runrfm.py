@@ -96,7 +96,7 @@ while True:
         print()
         stlogger.info('RFM ANALYSIS FINISHED')
         mylogger.info('%s,RFM ANALYSIS FINISHED' %(log.log_no()))
-        conn = pymysql.connect(host = '172.16.2.211',port=3306,database='log',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+        conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
         cur = conn.cursor()
         sql = []
         sql += [log.sqlquery(filename="log.csv",database="log",table="log",columns="`filename`,`loglevel`,`log_no`,`message`,`datetime`",linedivider="\\n",ignorelines="0")]
