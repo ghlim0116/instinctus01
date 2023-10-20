@@ -27,7 +27,7 @@ onemonth = relativedelta.relativedelta(months=1)
 oneday = datetime.timedelta(days=1)
 requested_end_date =  datetime.datetime.now().date()
 requested_start_date = requested_end_date - onemonth
-CLIENT_ID = '866571621184-mptvao19m79oc988nrab0d6rsc49b4ec.apps.googleusercontent.com'
+CLIENT_ID = '*****************************************'
 
 
 def main(
@@ -77,7 +77,7 @@ def map_locations_ids_to_resource_names(client, location_ids):
     build_resource_name = client.get_service("GeoTargetConstantService").geo_target_constant_path
     return [build_resource_name(location_id) for location_id in location_ids]
 
-conn = pymysql.connect(host = '172.16.2.211',port=3306,database='keywordqc',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
 cur = conn.cursor()
 sql = '''SELECT * FROM `keywordqc`.`keywords`'''
 cur.execute(sql)
