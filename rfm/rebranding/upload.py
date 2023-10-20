@@ -13,7 +13,7 @@ sys.path.append("../../log")
 import log
 
 def uploadrfm():
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     sql = []
     sql += [log.sqlquery(filename="mid rfmMLallindex.csv",database="cafe24",table="rfmrebranding",ignorelines="1",linedivider="\n",columns="`date`,`member_id`,`r`,`f`,`m`,`r_grade`,`f_grade`,`m_grade`,`rfm_index`,`group`")]
