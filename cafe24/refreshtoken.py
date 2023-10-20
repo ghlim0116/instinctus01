@@ -11,7 +11,7 @@ def refresh():
     url = "https://instinctus1.cafe24api.com/api/v2/oauth/token"
     payload = 'grant_type=refresh_token&refresh_token=%s' %(rtoken)
     headers = {
-        'Authorization': "Bearer UDYxSEZhRnZDVmtuZm9RcjRWNGlDRDpHYXFZU0R1RUlwanBpSk40U2dnT0NB",
+        'Authorization': "Bearer *************************************************",
         'Content-Type': "application/x-www-form-urlencoded"
         }
     response = requests.request("POST", url, data=payload, headers=headers)
