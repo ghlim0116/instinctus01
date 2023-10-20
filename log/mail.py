@@ -10,7 +10,7 @@ import json
 def Keyerror(msg=""):
     raise KeyError(msg)
 
-def mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To=[],CC=[],attachments=[]):
+def mail(subject="",body="",From="**********@cheremimaka.com",To=[],CC=[],attachments=[]):
     if subject == "":
         Keyerror("제목을 입력하십시오")
     elif body == "":
@@ -50,4 +50,4 @@ def mail(subject="",body="",From="SOPmanagement@cheremimaka.com",To=[],CC=[],att
     smtp.quit()
 
 if __name__=='__main__':
-    mail(subject="Test",body="Test",To=["temp.lim@cheremimaka.com"],CC=["geonho.lim@cheremimaka.com"],attachments=[])
+    mail(subject="Test",body="Test",To=["********@cheremimaka.com"],CC=["*********@cheremimaka.com"],attachments=[])
