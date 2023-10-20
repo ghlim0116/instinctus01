@@ -1,7 +1,0 @@
-shop_no,group_no,group_name,group_description,group_icon,benefits_paymethod,buy_benefits,ship_benefits,product_availability,mileage,discount
-1,17,인스팅터스 직원,인스팅터스 직원,,A,D,F,A,0,37.00
-1,16,LOVER,LOVER,,A,P,F,A,4.00,10.00
-1,5,VIP,VIP,,A,M,F,A,2.00,0
-1,6,FAMILY,FAMILY,,A,M,F,A,1.50,0
-1,4,FRIEND,FRIEND,,A,M,F,A,1.00,0
-1,1,MEMBER,MEMBER,,A,M,F,A,0.50,0
