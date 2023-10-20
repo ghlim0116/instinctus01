@@ -6,8 +6,8 @@ def refresh():
         token = f.read()
     rtoken= json.loads(token)['refresh_token']
 
-    CLIENT_ID = '866571621184-mptvao19m79oc988nrab0d6rsc49b4ec.apps.googleusercontent.com'
-    CLIENT_SECRET = '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'
+    CLIENT_ID = '********************************************'
+    CLIENT_SECRET = '********************************'
     url = 'https://oauth2.googleapis.com/token'
     payload = '''grant_type=refresh_token&refresh_token={}&client_id={}&client_secret={}&access_type=offline'''.format(rtoken,CLIENT_ID,CLIENT_SECRET)
     headers = {
