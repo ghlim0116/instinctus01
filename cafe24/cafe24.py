@@ -44,7 +44,7 @@ while True:
         stlogger.info('GET CAFE24 DATA\n')
         mylogger.info('%s,GET CAFE24 DATA' %(log.log_no()))
         
-        conn = pymysql.connect(host = '172.16.2.211',port=3306,database='log',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+        conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
         cur = conn.cursor()
         sql = log.sqlquery(filename="log.csv",database="log",table="log",columns="`filename`,`loglevel`,`log_no`,`message`,`datetime`",linedivider="\\n",ignorelines="0")
         cur.execute(sql)
@@ -82,7 +82,7 @@ while True:
         stlogger.info('UPLOAD DATA TO MARIADB\n')
         mylogger.info('%s,UPLOAD DATA TO MARIADB' %(log.log_no()))
 
-        conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+        conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
         cur = conn.cursor()
         sql = []
         sql += [log.sqlquery(filename="orders.csv",database="cafe24",table="orders",columns="`order_id`, `currency`, `market_id`, `member_id`, `member_email`, `billing_name`, `payment_method`, `order_date`, `first_order`, `payment_date`, `group_no_when_ordering`, `order_price_amount`, `shipping_fee`, `points_spent_amount`, `credits_spent_amount`, `coupon_discount_price`, `coupon_shipping_fee_amount`, `membership_discount_amount`, `shipping_fee_discount_amount`, `set_product_discount_amount`, `app_discount_amount`, `point_incentive_amount`, `total_amount_due`, `payment_amount`, `market_other_discount_amount`, `order_place_name`, `order_place_id`, `postpay`, `additional_shipping_fee`, `international_shipping_insurance`, `additional_handling_fee`, `shipping_type`, `shipping_type_text`, `shipping_status`")]
@@ -107,10 +107,10 @@ while True:
         mylogger.error('%s,"%s"' %(errorlogno,e))
         stlogger.info('*** AN ERROR OCCURED ***')
         errorlogger.error('%s,"%s","%s"' %(errorlogno, str(e), traceback.format_exc().replace('"',"'")))
-        mail.mail(subject="Cafe24 Data Pipeline Error: %s" %(str(e)),body=traceback.format_exc().replace('"',"'"),To=["geonho.lim@cheremimaka.com"])
+        mail.mail(subject="Cafe24 Data Pipeline Error: %s" %(str(e)),body=traceback.format_exc().replace('"',"'"),To=["*********@cheremimaka.com"])
         
     finally:
-        conn = pymysql.connect(host = '172.16.2.211',port=3306,database='log',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+        conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
         cur = conn.cursor()
         sql = []
         sql += [log.sqlquery(filename="log.csv",database="log",table="log",columns="`filename`,`loglevel`,`log_no`,`message`,`datetime`",linedivider="\\n",ignorelines="0")]
