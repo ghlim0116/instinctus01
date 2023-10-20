@@ -23,7 +23,7 @@ def instagram():
     (`id`,`follow_count`,`followed_by_count`,`has_profile_picture`,`is_private`,`is_published`,`media_count`,`profile_pic`,`username`,`ig_account_id`,`datetime`);
     """]
 
-    conn = pymysql.connect(host = '172.16.2.211',port=3306,database='instagram',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+    conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
     cur = conn.cursor()
     for cmd in sql:
         cur.execute(cmd)
