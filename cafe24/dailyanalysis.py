@@ -20,7 +20,7 @@ while day <= end_date:
 
 # get data from MariaDB
 print("*** DATA IMPORTING ***")
-conn = pymysql.connect(host = '172.16.2.211',port=3306,database='cafe24',charset='utf8mb4',local_infile=1, user='root',password='skxortn1!')
+conn = pymysql.connect(host = '***.***.***.***',port=********,database='********',charset='utf8mb4',local_infile=1, user='********',password='********')
 cur = conn.cursor()
 sql = []
 sql += ['''SELECT `member_id`,`created_date`,`last_login_date` FROM `cafe24`.`customers`''']
